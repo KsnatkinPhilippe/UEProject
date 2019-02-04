@@ -6,7 +6,7 @@ Created on Mon Jan 28 13:34:13 2019
 @author: 3700067
 """
 
-from soccersimulator import*
+from soccersimulator import *
 
 class SuperState ( object ):
     def __init__ ( self , state , id_team , id_player ):
@@ -32,13 +32,12 @@ class SuperState ( object ):
     def foncerVersBallonV2( self ) : #aller vers la futur position du ballon
         if self.state.ball.vitesse.norm != 0 : # vérifie que la balle bouge   
             return SoccerAction( acceleration = ( self.state.ball.vitesse.norm_max(maxBallAcceleration) + self.ball  - self.player).norm_max( maxPlayerAcceleration )) 
-        return self.foncer # Peut-etre mieux sans le faire bouger
+        return self.move( self.ball ) # Peut-etre mieux sans le faire bouger
 
 
     
-    @property
-    def foncer( self ): # aller vers la balle immobile
-        return SoccerAction( acceleration = ( self.ball - self.player ).norm_max( maxPlayerAcceleration ) )
+    def move( self , cible ): # aller vers la cible immobile
+        return SoccerAction( acceleration = ( cible - self.player ).norm_max( maxPlayerAcceleration ) )
          
     
         
@@ -74,15 +73,28 @@ class SuperState ( object ):
 #        
 #        return listeTrier[0]
     
-
         else :
             return self.dribbler
 
 
     @property
-    def tem_gotBall( self ):
-        
+    def team_gotBall( self ) :    #trouve l'adversaire le plus proche devant soit renvoi un tuple ( distance , id_team ) 
+        return self.id_team == min([( self.ball.distance( self.state.player_state( id_team , id_player ).position ) , id_team ) for ( id_team , id_player ) in self.state.players])[1]
+
+    @property 
+    def maTeam( self ) :
+        return [ self.player for self.player in self.state.players if id_team == self.id_team ]
+    
+    @property 
+    def teamOpp( self ) :
+        return [ self.player for self.player in self.state.players if id_team != self.id_team ]
+    
+
+
+    @property
+    def se_replacer( self ) :
+        return self.move ( Vector2D(( (1./4 + ( self.id_team - 2 )) / 2) * GAME_WIDTH , GAME_HEIGHT/2) )
+                    
+
+
        
-        
-        
-        

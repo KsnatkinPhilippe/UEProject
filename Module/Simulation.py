@@ -57,6 +57,23 @@ class Bourrin(Strategy):
             return SoccerAction(acceleration = (state.ball.position - state.player_state(id_team, id_player).position).norm_max( maxPlayerAcceleration )) 
 
 
+
+class Defenseur(Strategy):
+    def __init__(self):
+        Strategy.__init__(self, "Random")
+
+
+    def compute_strategy(self, state, id_team, id_player):
+
+        # id_team is 1 or 2
+        # id_player starts at 0    
+        
+        s = SuperState ( state , id_team , id_player )
+        
+        if (( 2 - id_player ) * GAME_WIDTH / 2  <= s.ball.x <= ( 3 - id_player ) * GAME_WIDTH / 2) or ( s.team_gotBall ) :
+            return s.se_replacer
+        else :
+            return s.foncerVersBallonV2
             
 
 # Create teams
@@ -64,7 +81,7 @@ team1 = SoccerTeam(name="Team 1")
 team2 = SoccerTeam(name="Team 2")
 
 # Add players
-team1.add("Principal", Attaquant())  # Random strategy
+team1.add("Principal", Defenseur())  # Random strategy
 team2.add("Static", Strategy())   # Static strategy
 
 # Create a match
