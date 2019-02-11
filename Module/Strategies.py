@@ -6,7 +6,7 @@ Created on Mon Feb 11 17:15:15 2019
 @author: 3522974
 """
 
-from Module.tools import*
+from .tools import *
 
 class Attaquant(Strategy):
     def __init__(self):
@@ -20,16 +20,13 @@ class Attaquant(Strategy):
         
         s = SuperState ( state , id_team , id_player )
         
-#        print ((state.ball.vitesse + s.ball).norm_max( maxBallAcceleration ) - s.player )
-        
-        
-        if s.player.distance( s.ball ) <= PLAYER_RADIUS + BALL_RADIUS : # condition si le joueur peut touche la balle
+        if s.gotBall : # condition si le joueur peut touche la balle
             if s.ball.distance( s.goal ) < 20 : # si la balle est dans la zone de shoot
                 return s.tirer_au_but
             else :
-                return s.avancer_en_esquivant( 40 )
+                return s.avancer_en_esquivant( 20 )
         else :
-            return s.foncerVersBallonV2
+            return s.to_ball
 
 
 class Bourrin(Strategy):
@@ -69,8 +66,12 @@ class Defenseur(Strategy):
         
         s = SuperState ( state , id_team , id_player )
         
-        if (( 2 - id_player ) * GAME_WIDTH / 2  <= s.ball.x <= ( 3 - id_player ) * GAME_WIDTH / 2) or ( s.team_gotBall ) :
+#        if s.gotBall :
+#            return s.tirer_au_but
+
+        if (( 2 - id_player ) * GAME_WIDTH / 2 + (id_player - 2)  <= s.ball.x <= ( 3 - id_player ) * GAME_WIDTH / 2) + (id_player - 1) or ( s.team_gotBall ) :
             return s.se_replacer
+        
         else :
-            return s.foncerVersBallonV2
+            return s.to_ball
             

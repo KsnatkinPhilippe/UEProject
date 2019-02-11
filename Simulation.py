@@ -7,7 +7,7 @@ Created on Mon Jan 28 13:59:17 2019
 """
 
 #
-from Module.tools import*
+from Module.Strategies import *
 
 # Create teams
 team1 = SoccerTeam(name="Team 1")
