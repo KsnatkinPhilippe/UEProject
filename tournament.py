@@ -7,7 +7,7 @@ Created on Mon Feb  4 18:59:40 2019
 """
 
 
-from Simulation import Attaquant , Defenseur
+from Module.Strategies import Attaquant , Defenseur
 from soccersimulator import SoccerTeam
 
 def get_team ( nb_players ):

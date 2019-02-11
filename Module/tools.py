@@ -89,12 +89,6 @@ class SuperState ( object ):
     def teamOpp( self ) :
         return [ self.player for self.player in self.state.players if id_team != self.id_team ]
     
-
-
     @property
     def se_replacer( self ) :
-        return self.move ( Vector2D(( (1./4 + ( self.id_team - 2 )) / 2) * GAME_WIDTH , GAME_HEIGHT/2) )
-                    
-
-
-       
+        return self.move ( Vector2D( ( ( 2*self.id_team - 1  ) / 4) * GAME_WIDTH , GAME_HEIGHT/2 ) )
