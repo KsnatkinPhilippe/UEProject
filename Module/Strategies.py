@@ -6,7 +6,7 @@ Created on Mon Feb 11 17:15:15 2019
 @author: 3522974
 """
 
-from tools import*
+from Module.tools import*
 
 class Attaquant(Strategy):
     def __init__(self):
