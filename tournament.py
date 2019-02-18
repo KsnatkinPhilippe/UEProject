@@ -6,19 +6,7 @@ Created on Mon Feb  4 18:59:40 2019
 @author: 3522974
 """
 
-
-from Module.Strategies import Attaquant , Defenseur
-from soccersimulator import SoccerTeam
-
-def get_team ( nb_players ):
-    team = SoccerTeam ( name = " Philippe ’s ␣ Team " )
-    if nb_players == 1:
-        team . add ( " Striker " , Attaquant ())
-    if nb_players == 2:
-        team . add ( " Striker " , Attaquant ())
-        team . add ( " Blocker " , Defenseur ())
-    return team
-
+from BestModule import get_team
 
 if __name__ == '__main__':
     from soccersimulator import Simulation , show_simu
