@@ -62,11 +62,11 @@ class Defenseur(Strategy):
     def compute_strategy(self, state, id_team, id_player): 
         
         s = SuperState ( state , id_team , id_player )
-        
+
         if s.gotBall :
             return s.tirer_au_but
-        if ((2*(1.5-id_team)*(GAME_WIDTH/2 - s.ball.x) <= 0) or (s.team_gotBall)) :
-            return s.se_replacer
+        if 2*(1.5-id_team)*(GAME_WIDTH/4 - s.ball.x) <= 0 :
+            return s.positionnement
         else :
             return s.to_ball
             

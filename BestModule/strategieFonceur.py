@@ -3,7 +3,7 @@ from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simula
 from soccersimulator.settings import GAME_WIDTH, GAME_HEIGHT, BALL_RADIUS, PLAYER_RADIUS
 
 
-class FonceurStrategy(Strategy):
+class Fonceur(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Fonceur")
 
