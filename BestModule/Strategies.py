@@ -9,8 +9,12 @@ Created on Mon Feb 11 17:15:15 2019
 from .tools import *
 
 class Attaquant(Strategy):
-    def __init__(self):
+    def __init__(self , force=1.2 , surface=15, zone=20, dribble=1.5):
         Strategy.__init__(self, "Random")
+        self . force = force
+        self . surface = surface
+        self . zone = zone
+        self . dribble = dribble
 
 
     def compute_strategy(self, state, id_team, id_player):
@@ -18,13 +22,15 @@ class Attaquant(Strategy):
         # id_team is 1 or 2
         # id_player starts at 0    
         
-        s = SuperState ( state , id_team , id_player )
+        s = SuperState ( state , id_team , id_player , self.dribble)
+
         
         if s.gotBall : # condition si le joueur peut touche la balle
-            if s.ball.distance( s.goal ) < 20 : # si la balle est dans la zone de shoot
-                return s.tirer_au_but
+            if s.ball.distance( s.goal ) < self.surface : # si la balle est dans la zone de shoot
+                return s.to_goal(self.force)
+#                return s.tirer_au_but
             else :
-                return s.avancer_en_esquivant( 20 )
+                return s.avancer_en_esquivant( self.zone )
         else :
             return s.to_ball
 

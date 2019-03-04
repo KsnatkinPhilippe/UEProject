@@ -9,10 +9,12 @@ Created on Mon Jan 28 13:34:13 2019
 from soccersimulator import *
 
 class SuperState ( object ):
-    def __init__ ( self , state , id_team , id_player ):
+    def __init__ ( self , state , id_team , id_player , dribble=1.27 , force=1.5):
             self.state = state
             self.id_team = id_team
             self.id_player = id_player
+            self . dribble = dribble
+            self . force = force
 
 #def __getattr__ ( self , attr ):
 #    return getattr ( self . state , attr )
@@ -35,7 +37,12 @@ class SuperState ( object ):
     
     @property
     def to_ball( self ) : #aller vers la futur position du ballon
-        return self.move(self.state.ball.vitesse.norm_max( maxBallAcceleration ) + self.ball)
+#        if (self.state.ball.vitesse.norm == 0):
+        return self.move(self.ball)
+#           if(self.ball.x==GAME_WIDTH/2 and  self.ball.y==GAME_HEIGHT/2):
+#               return self.move(Vector2D(GAME_WIDTH/2-15, GAME_HEIGHT/2))
+#        else :
+#            return self.move(3*self.state.ball.vitesse.normalize() + self.ball)
 
 
     def shoot( self , cible , norme) :
@@ -44,49 +51,54 @@ class SuperState ( object ):
     def move( self , cible ): # aller vers la cible immobile
         return SoccerAction( acceleration = ( cible - self.player ).normalize() * maxPlayerAcceleration )
         
-    @property #vitesse du joueur a opti
+    @property 
     def dribbler( self ) : # foncer vers les buts avec le ballon
-        return self.shoot( self.goal , maxPlayerShoot / 4 )
+        return self.to_ball + self.shoot( self.goal , self.dribble )
 
     @property
     def tirer_au_but( self ):
-        return self.shoot( self.goal , maxPlayerShoot)
+#        return self.shoot( self.goal , 1/(1 + math.exp(-5*(self.ball.distance( self.goal )- 30))))
+        return self.shoot( self.goal , maxPlayerShoot )
+
 
     def to_goal( self , norme):
         return self.shoot( self.goal , norme)
 
     @property
     def adversaire_le_plus_proche( self ) :    #trouve l'adversaire le plus proche devant soit renvoi un tuple ( distance , id_ player , (distance en y , distance en x) , id_team ) 
-        return  min([( self.player.distance( self.state.player_state( id_team , id_player ).position ) ,  id_player , (self.state.player_state( id_team , id_player ).position.y - self.player.y, self.state.player_state( id_team , id_player ).position.x - self.player.x ) , id_team ) for ( id_team , id_player ) in self.state.players if id_team != self.id_team])
-
-
+        return min([( self.player.distance( self.state.player_state( id_team , id_player ).position ) ,  id_player , (self.state.player_state( id_team , id_player ).position.y - self.player.y, self.state.player_state( id_team , id_player ).position.x - self.player.x ) , id_team ) for ( id_team , id_player ) in self.state.players if (id_team != self.id_team)and(2*(1.5-self.id_team)*(self.player.x-self.state.player_state( id_team , id_player ).position.x)<=0)], default=None)
+#        listeTrier = sorted( liste , key = lambda x: x[1]) 
+#        return  (listeTrier[0]) 
+# incorporer les passes en utilisant cette fonction
 
     def avancer_en_esquivant( self , zone ) :     #prend en argument la zone de souveraineté du joueur et renvoie la marche a suivre
         
-        dist_opp, id_opp, (diff_y, diff_x), id_team_opp = self.adversaire_le_plus_proche        
-        adversaire = self.state.player_state( id_team_opp , id_opp).position        
-        dir_adv = adversaire - self.ball 
+        if (self.adversaire_le_plus_proche != None):
+            
+            dist_opp, id_opp, (diff_y, diff_x), id_team_opp = self.adversaire_le_plus_proche        
+            adversaire = self.state.player_state( id_team_opp , id_opp).position        
+            dir_adv = adversaire - self.ball 
 
-        if ((2*(1.5-self.id_team)*diff_x>0) and (dist_opp < zone)) :         
-           if 2*(1.5-self.id_team)*diff_y < 0 : # si l'adversaire est a ma gauche je vais a droite et inversement
-                dir_adv.angle += math.pi/4
-           else :
-               dir_adv.angle -= math.pi/4
-           return SoccerAction ( shoot = dir_adv.normalize() * maxPlayerShoot /8 )
-#        listeTrier = sorted( liste , key = lambda x: x[1])        
-#        return listeTrier[0]    
+            if ((2*(1.5-self.id_team)*diff_x>0) and (dist_opp < zone)) :         
+                if 2*(1.5-self.id_team)*diff_y < 0 : # si l'adversaire est a ma gauche je vais a droite et inversement
+                    dir_adv.angle += math.pi/4
+                else :
+                    dir_adv.angle -= math.pi/4
+                return self.to_ball + SoccerAction ( shoot = dir_adv.normalize() * self.dribble/1.5 )          
+            else :
+                return self.dribbler
         else :
-            return self.dribbler
+            return self.to_goal(self.force)
 
     @property
     def gotBall( self ):
-        return self.player.distance( self.ball ) <= PLAYER_RADIUS + BALL_RADIUS
+        return self.player.distance( self.ball ) <=0.5 + PLAYER_RADIUS + BALL_RADIUS
     
     @property 
     def positionnement( self ):
         if self.ball.distance(self.goal_ally) < 17 :
             return self.to_ball
-        return self.move ( Vector2D( ( ( 2*self.id_team - 1  ) / 8) * GAME_WIDTH , (self.ball.y + self.goal_ally.y)/2))
+        return self.move ( Vector2D( (6*(self.id_team-1) + 1) / 8 * GAME_WIDTH , (self.ball.y + self.goal_ally.y)/2))
               
     @property
     def team_gotBall( self ) :    #trouve l'adversaire le plus proche devant soit renvoi un tuple ( distance , id_team ) 
@@ -99,4 +111,7 @@ class SuperState ( object ):
     @property 
     def teamOpp( self ) :
         return [ self.player for self.player in self.state.players if id_team != self.id_team ]
+    
+#passer la ball 
+
     
