@@ -9,7 +9,7 @@ Created on Mon Feb 11 17:15:15 2019
 from .tools import *
 
 class Attaquant(Strategy):
-    def __init__(self , force=1.2 , surface=15, zone=20, dribble=1.5):
+    def __init__(self , force=1.2 , surface=15, zone=25, dribble=1.):
         Strategy.__init__(self, "Random")
         self . force = force
         self . surface = surface
@@ -70,9 +70,30 @@ class Defenseur(Strategy):
         s = SuperState ( state , id_team , id_player )
 
         if s.gotBall :
-            return s.tirer_au_but
-        if 2*(1.5-id_team)*(GAME_WIDTH/4 - s.ball.x) <= 0 :
-            return s.positionnement
-        else :
-            return s.to_ball
-            
+            return s.passe
+        return s.positionnement
+
+def gobetterdef (state):
+    if s.gotBall  :
+        return SoccerAction(shoot=state.goal-state.player)
+    else :
+        return SoccerAction (acceleration=state.ballameliorer-state.player)
+
+    
+def defenseur2 (state):
+    if self.ballameliorer.x > GAME_WIDTH/3 : 
+        return SoccerAction(Vector2D(GAME_WIDTH/4, (state.ballameliorer.y+state.goal.y)/2 )-state.player, state.goal-state.player)
+    else :
+        return gobetterdef(state)
+
+    
+class Goal(Strategy):
+    def __init__(self):
+        Strategy.__init__(self, "Random")
+
+    def compute_strategy(self, state, id_team, id_player): 
+        
+        s = SuperState ( state , id_team , id_player )
+    
+        return SoccerAction(0, s.goal - s.player)
+    
