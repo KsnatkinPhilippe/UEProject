@@ -18,7 +18,7 @@ team1 = SoccerTeam(name="Team 1")
 team2 = SoccerTeam(name="Team 2")
 
 # Add players
-team1.add("Principal", Defenseur())  
+team1.add("Principal", Goal())  
 #team1.add("Principal", Attaquant())  
 #team2.add("Static", Defenseur())   
 team2.add("Principal2", Attaquant())

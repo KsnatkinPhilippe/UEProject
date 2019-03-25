@@ -5,11 +5,11 @@ Created on Mon Mar 25 16:43:28 2019
 
 @author:  3522974
 """
-
+import numpy as np
 from Strategies import*
 
 class QLearning ( object ):
-    def __init__ ( self , strategy , simu = None , max_steps =1000000 , max_round_step =100 , monte_carlo = False):
+    def __init__ ( self , strategy , simu = None , max_steps =10000 , max_round_step =100 , monte_carlo = False):
         self . strategy = strategy
         self . simu = simu
         self . max_steps = max_steps
@@ -112,7 +112,7 @@ class QLearning ( object ):
         else :
             prob /= prob . sum ()
         
-        return choice ( list ( self . strategy . strategy_names ) , p = prob )    
+        return np.random.choice ( list ( self . strategy . strategy_names ) , p=prob )    
     
     
     

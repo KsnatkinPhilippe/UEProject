@@ -19,8 +19,6 @@ class SuperState ( object ):
 #def __getattr__ ( self , attr ):
 #    return getattr ( self . state , attr )
 
-
-
     @property
     def ball ( self ):
         return self.state.ball.position

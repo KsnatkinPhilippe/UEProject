@@ -6,17 +6,18 @@ Created on Mon Mar 25 16:53:11 2019
 @author:  3522974
 """
 
-from learning import QLearning , QStrategy
+import pickle as pkl
+from learning import *
 
 # Strategy
 QTestStrategy = QStrategy ()
-#QTestStrategy . add ( ' right ' , Strategy ( shoot_right , ' ' ))
-#QTestStrategy . add ( ' left ' , Strategy ( shoot_left , ' ' ))
-#QTestStrategy . add ( ' up ' , Strategy ( shoot_up , ' ' ))
-#QTestStrategy . add ( ' down ' , Strategy ( shoot_down , ' ' ))
+#QTestStrategy . add ( ' right ' , SimpleStrategy ( shoot_right , ' ' ))
+#QTestStrategy . add ( ' left ' , SimpleStrategy ( shoot_left , ' ' ))
+#QTestStrategy . add ( ' up ' , SimpleStrategy ( shoot_up , ' ' ))
+#QTestStrategy . add ( ' down ' , SimpleStrategy ( shoot_down , ' ' ))
 
 QTestStrategy . add ( ' attaque ' , Attaquant ( ))
-QTestStrategy . add ( ' attaque ' , Defenseur ( ))
+QTestStrategy . add ( ' defense ' , Defenseur ( ))
 
 # Learning
 expe = QLearning ( strategy = QTestStrategy , monte_carlo = False )
@@ -31,5 +32,5 @@ with open ( 'qstrategy.pkl.351' , 'rb') as fi :
     QStrategy = pkl . load ( fi )
 
     # Simulate and display the match
-#    simu = RandomPos ( QStrategy )
+    simu = RandomPos ( QStrategy )
     simu . start ()
