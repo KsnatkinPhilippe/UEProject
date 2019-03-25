@@ -18,11 +18,11 @@ team1 = SoccerTeam(name="Team 1")
 team2 = SoccerTeam(name="Team 2")
 
 # Add players
-#team1.add("Principal", GoTestStrategy())  
+team1.add("Principal", Defenseur())  
 #team1.add("Principal", Attaquant())  
 #team2.add("Static", Defenseur())   
 team2.add("Principal2", Attaquant())
-team1.add("Static2", Defenseur())
+#team1.add("Static2", Goal())
 # Create a match
 simu = Simulation(team1, team2)
 

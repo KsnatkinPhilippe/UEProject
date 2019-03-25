@@ -9,7 +9,7 @@ Created on Mon Jan 28 13:34:13 2019
 from soccersimulator import *
 
 class SuperState ( object ):
-    def __init__ ( self , state , id_team , id_player , dribble=1 , force=1.2):
+    def __init__ ( self , state , id_team , id_player , dribble=12 , force=12):
             self.state = state
             self.id_team = id_team
             self.id_player = id_player
@@ -91,11 +91,11 @@ class SuperState ( object ):
             dir_adv = adversaire - self.ball 
 
             if ((2*(1.5-self.id_team)*diff_x>0) and (dist_opp < zone)) :         
-                if 2*(1.5-self.id_team)*diff_y < 0 : # si l'adversaire est a ma gauche je vais a droite et inversement
-                    dir_adv.angle += math.pi/4
+                if 2*(1.5-self.id_team)*diff_y   < 0 : # si l'adversaire est a ma gauche je vais a droite et inversement
+                    dir_adv.angle += math.pi/6
                 else :
-                    dir_adv.angle -= math.pi/4
-                return self.to_ball + SoccerAction ( shoot = dir_adv.normalize() * self.dribble/1.5 )          
+                    dir_adv.angle -= math.pi/6
+                return self.to_ball + SoccerAction ( shoot = dir_adv.normalize() * self.dribble )          
             else :
                 return self.dribbler
         else :
@@ -105,7 +105,7 @@ class SuperState ( object ):
     def gotBall( self ):
         if (self.state.ball.vitesse.norm == 0):
             return self.player.distance( self.ball ) < 1.784 + PLAYER_RADIUS + BALL_RADIUS
-        return self.player.distance( self.ball ) < 0 + PLAYER_RADIUS + BALL_RADIUS
+        return self.player.distance( self.ball ) < PLAYER_RADIUS + BALL_RADIUS
     
     
     @property 
@@ -141,6 +141,28 @@ class SuperState ( object ):
         if (not self.ciblePasse):
             return self.dribbler
         return self.shoot( self.state.player_state( self.id_team , self.ciblePasse[1]).position , 1 )
+    
+    @property
+    def attaque(self):
+        if self.ball.distance(self.goal_ally) < GAME_WIDTH/2  :
+            return self.move(Vector2D( GAME_WIDTH/2 , self.ball.y ))
+        
+        if self.gotBall : # condition si le joueur peut touche la balle
+            if self.ball.distance( self.goal ) < 25 : # si la balle est dans la zone de shoot
+                return self.to_goal(self.force)
+            else :
+                return self.avancer_en_esquivant( 30 )
+        else :
+            return self.to_ball
+        
+    @property
+    def defense(self):
+        if self.gotBall :
+            return self.passe
+        return self.positionnement
+        
+        
+    
         
 
 

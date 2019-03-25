@@ -6,10 +6,10 @@ Created on Mon Feb 11 17:15:15 2019
 @author: 3522974
 """
 
-from .tools import *
+from tools import *
 
 class Attaquant(Strategy):
-    def __init__(self , force=1.2 , surface=15, zone=25, dribble=1.):
+    def __init__(self , force=2 , surface=25, zone=30, dribble=1.34):
         Strategy.__init__(self, "Random")
         self . force = force
         self . surface = surface
@@ -28,7 +28,6 @@ class Attaquant(Strategy):
         if s.gotBall : # condition si le joueur peut touche la balle
             if s.ball.distance( s.goal ) < self.surface : # si la balle est dans la zone de shoot
                 return s.to_goal(self.force)
-#                return s.tirer_au_but
             else :
                 return s.avancer_en_esquivant( self.zone )
         else :
@@ -72,19 +71,19 @@ class Defenseur(Strategy):
         if s.gotBall :
             return s.passe
         return s.positionnement
-
-def gobetterdef (state):
-    if s.gotBall  :
-        return SoccerAction(shoot=state.goal-state.player)
-    else :
-        return SoccerAction (acceleration=state.ballameliorer-state.player)
-
-    
-def defenseur2 (state):
-    if self.ballameliorer.x > GAME_WIDTH/3 : 
-        return SoccerAction(Vector2D(GAME_WIDTH/4, (state.ballameliorer.y+state.goal.y)/2 )-state.player, state.goal-state.player)
-    else :
-        return gobetterdef(state)
+#
+#def gobetterdef (state):
+#    if s.gotBall  :
+#        return SoccerAction(shoot=state.goal-state.player)
+#    else :
+#        return SoccerAction (acceleration=state.ballameliorer-state.player)
+#
+#    
+#def defenseur2 (state):
+#    if self.ballameliorer.x > GAME_WIDTH/3 : 
+#        return SoccerAction(Vector2D(GAME_WIDTH/4, (state.ballameliorer.y+state.goal.y)/2 )-state.player, state.goal-state.player)
+#    else :
+#        return gobetterdef(state)
 
     
 class Goal(Strategy):
@@ -95,5 +94,7 @@ class Goal(Strategy):
         
         s = SuperState ( state , id_team , id_player )
     
-        return SoccerAction(0, s.goal - s.player)
+  #      return s.move(Vector2D(s.goal_ally.x+10,((s.ball.y + s.goal_ally.y)/2)))
+        return s.move(Vector2D(s.goal_ally.x+5,s.ball.y ))
+
     
