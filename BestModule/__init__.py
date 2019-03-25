@@ -15,5 +15,10 @@ def get_team ( nb_players ):
     if nb_players == 2:
         team . add ( " Striker " , Attaquant ())
         team . add ( " Blocker " , Defenseur ())
+    if nb_players == 4:
+        team . add ( " Striker " , Attaquant ())
+        team . add ( " Striker2 " , Attaquant ())
+        team . add ( " Blocker " , Defenseur ())
+        team . add ( " Blocker2 " , Defenseur ())
     return team
 
