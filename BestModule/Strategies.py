@@ -6,7 +6,7 @@ Created on Mon Feb 11 17:15:15 2019
 @author: 3522974
 """
 
-from tools import *
+from .tools import *
 
 class Attaquant(Strategy):
     def __init__(self , force=2 , surface=25, zone=30, dribble=1.34):
@@ -94,7 +94,9 @@ class Goal(Strategy):
         
         s = SuperState ( state , id_team , id_player )
     
-  #      return s.move(Vector2D(s.goal_ally.x+10,((s.ball.y + s.goal_ally.y)/2)))
+#      return s.move(Vector2D(s.goal_ally.x+10,((s.ball.y + s.goal_ally.y)/2)))
+        if s.gotBall :
+            return s.passe
         return s.move(Vector2D(s.goal_ally.x+5,s.ball.y ))
 
     
