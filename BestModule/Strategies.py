@@ -97,6 +97,8 @@ class Goal(Strategy):
 #      return s.move(Vector2D(s.goal_ally.x+10,((s.ball.y + s.goal_ally.y)/2)))
         if s.gotBall :
             return s.passe
+        if s.goal_ally.distance(s.ball) < 20 :
+            return s.to_ball
         return s.move(Vector2D(s.goal_ally.x+5,s.ball.y ))
 
     
