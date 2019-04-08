@@ -1,0 +1,30 @@
+Q1.2:
+concernant le positionnement des joueurs, je reprend ce qui a été fait dans la question 1 : 
+-quand la balle est du coté adverse, le joueur se repositionne au milieu de son terrain (position_volley);
+-quand la balle est du coté allié, le joueur va vers la balle avec une anticipation du mouvement (to_ball);
+
+pour le shoot j'ai crée une nouvelle methode : shootOpti
+cette methode recupère la position de l' adversaire puis verifie quel est l'id_team allié.
+en fonction de cet id_team, la direction du shoot va varier car on veut envoyer la balle du coté adverse sans la faire sortir du terrain.
+pour ce faire on déimitera le terrain adverse à l'aide de GAME_WIDTH/2 et on choisira la direction du shoot avec :
+-en x le x de l'adversaire inversé par rapport à son terrain
+-en y le y de l'adversaire inversé par rapport à son terrain
+
+dans le cas où l'adversaire est situé au milieu de son terrain, la balle est tirée dans un coin de son terrain.
+
+
+
+Q1.3
+l'important ici est le positionnement du joueur defenseur et j'ai repris ce qui à déja été fait dans les question precedantes :
+-quand la balle est du coté adverse, le joueur se repositionne au milieu de son terrain (position_volley) pour convrir le moins de distance possible lors de l'attaque;
+-quand la balle est du coté allié, le joueur va vers la balle avec une anticipation du mouvement (to_ball) pour éviter de perdre la balle;
+
+une fois la balle récupérée le tir s'effectue comme dans la stratégie Attaque
+
+
+
+
+Q1.4
+pour la stratégie 1 vs 1 on utilise les 2 questions précedentes : on implémente les 2 stratégies en 1 seule 
+- pour l'attaque (savoir où tirer) on utilise la réponse à la question 2
+- pour la défense (se positionner intelligement et aller vers la balle en anticipant sa trajectoire) on utilise la réponse à la question 3
