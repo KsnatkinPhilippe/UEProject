@@ -9,7 +9,7 @@ Created on Mon Jan 28 13:34:13 2019
 from soccersimulator import *
 
 class SuperState ( object ):
-    def __init__ ( self , state , id_team , id_player , dribble=12 , force=12):
+    def __init__ ( self , state , id_team , id_player , dribble=.6 , force=.2):
             self.state = state
             self.id_team = id_team
             self.id_player = id_player
@@ -18,6 +18,9 @@ class SuperState ( object ):
 
 #def __getattr__ ( self , attr ):
 #    return getattr ( self . state , attr )
+
+#    def playerState( self ):
+        
 
     @property
     def ball ( self ):
@@ -39,21 +42,22 @@ class SuperState ( object ):
     def to_ball( self ) : #aller vers la futur position du ballon
 #        if(self.ball.x==GAME_WIDTH/2 and  self.ball.y==GAME_HEIGHT/2):
 #        if(self.ball == Vector2D(GAME_WIDTH/2 , GAME_HEIGHT/2)):
-#            return self.move(Vector2D(GAME_WIDTH/2 - 2*(1.5-self.id_team)*15, GAME_HEIGHT/2))
-        return self.move(3*self.state.ball.vitesse + self.ball)
+#            return self.move(Vector2D(GAME_WIDTH/2 - 2*(1.5-self.id_team)*15, GAME_HEIGHT/2
+        if self.ball.distance(self.player) < 4 :
+            return self.move(self.ball)
+        return self.move(5*self.state.ball.vitesse + self.ball)
 
 
     def shoot( self , cible , norme) :
-        return SoccerAction( shoot = ( cible - self.ball ).normalize() * norme ) 
+        return self.to_ball + SoccerAction( shoot = ( cible - self.ball ).normalize() * norme ) 
     
     def move( self , cible ): # aller vers la cible immobile
         acceleration = cible - self.player
         acceleration.norm = settings.maxPlayerAcceleration
         return SoccerAction( acceleration )
         
-    @property 
-    def dribbler( self ) : # foncer vers les buts avec le ballon
-        return self.to_ball + self.shoot( self.goal , self.dribble )
+    def dribbler( self , cible) : # foncer vers les buts avec le ballon
+        return self.to_ball + self.shoot( cible, self.dribble )
 
     @property
     def tirer_au_but( self ):
@@ -95,15 +99,15 @@ class SuperState ( object ):
                     dir_adv.angle -= math.pi/6
                 return self.to_ball + SoccerAction ( shoot = dir_adv.normalize() * self.dribble )          
             else :
-                return self.dribbler
+                return self.dribbler(self.goal)
         else :
             return self.to_goal(self.force)
 
     @property
     def gotBall( self ):
-        if (self.state.ball.vitesse.norm == 0):
-            return self.player.distance( self.ball ) < 1.784 + PLAYER_RADIUS + BALL_RADIUS
-        return self.player.distance( self.ball ) < PLAYER_RADIUS + BALL_RADIUS
+#        if (self.state.ball.vitesse.norm == 0):
+#            return self.player.distance( self.ball ) < 1.784 + PLAYER_RADIUS + BALL_RADIUS
+        return self.player.distance( self.ball ) <= PLAYER_RADIUS + BALL_RADIUS + self.state.ball.vitesse.norm
     
     
     @property 
@@ -120,12 +124,7 @@ class SuperState ( object ):
     @property 
     def maTeam( self ) :
         return [ ( id_team , id_player ) for ( id_team , id_player ) in self.state.players if id_team == self.id_team ]
-    
-    @property 
-    def teamOpp( self ) :
-        
-        return [self.state.player_state(id_team, id_player).position for (id_team , id_player) in self.state.players if id_team != self.id_team]
-    
+      
 
     @property 
     def ciblePasse(self): #trouve le partenaire le plus libre  et renvoie un tuple (distance avec adv le plus proche , id_player  )
@@ -134,11 +133,24 @@ class SuperState ( object ):
 
         
 
+#    @property 
+#    def passe(self):
+#        if (not self.ciblePasse):
+#            return self.dribbler
+#        return self.shoot( self.state.player_state( self.id_team , self.ciblePasse[1]).position , 1 )
+    
     @property 
     def passe(self):
-        if (not self.ciblePasse):
-            return self.dribbler
-        return self.shoot( self.state.player_state( self.id_team , self.ciblePasse[1]).position , 1 )
+        ciblePos=self.state.player_state( self.id_team , self.id_player+1).position
+        
+        if self.id_player==3:
+            ciblePos=self.goal
+        
+        if self.id_player<2 and self.state.player_state( self.id_team , self.id_player+1).position.distance(self.player) < 15:
+            ciblePos=self.state.player_state( self.id_team , self.id_player+2).position
+        
+        d=self.ball.distance(ciblePos)
+        return self.shoot( ciblePos , d/9 )
     
     @property
     def attaque(self):
@@ -160,8 +172,21 @@ class SuperState ( object ):
         return self.positionnement
         
         
+    def placerEntrePourxDef(self , x , pos1 , pos2 ): # a ameliorer
+        a = (pos2.y - pos1.y)/(pos2.x - pos1.x)
+        b = pos2.y - pos2.x*a
+        return Vector2D( x , a*x+b )
     
-        
-
-
+    @property
+    def AdvAtt( self ) :    #trouve l'adversaire le plus proche de mes buts en renvoyant un tuple ( distance au cages , Position du joueur , ( id_team, id_ player ) )
+        advTuple = [( jPos.distance( self.goal_ally ) , player ) for ( jPos , player ) in self.advs ]
+        return min( advTuple )
     
+    def milieuAtt(self):
+        return self.state.player_state ( self.id_team , 2 ).position
+
+    @property
+    def estLePlusPrès(self):
+        mates= [ ( self.ball.distance(self.state.player_state( id_team , id_player ).position ) , id_player ) for ( id_team , id_player ) in self.maTeam ]
+        distlProch , idProche = min(mates)
+        return self.id_player == idProche
