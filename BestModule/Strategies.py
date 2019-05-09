@@ -32,7 +32,7 @@ class Bourrin(Strategy):
 
 
 class Attaquant(Strategy):
-    def __init__(self , force=4 , surface=50, zone=20, dribble=.4):
+    def __init__(self , force=4 , surface=50, zone=20, dribble=2.):
         Strategy.__init__(self, "Random")
         self . force = force
         self . surface = surface
@@ -47,15 +47,12 @@ class Attaquant(Strategy):
         
         s = SuperState ( state , id_team , id_player , self.dribble)
 
-        if (3-2*s.id_team)*(s.ball.x - GAME_WIDTH*(s.id_team/2)) > 0 :
-            if s.gotBall : # condition si le joueur peut touche la balle
-                if s.ball.distance( s.goal ) < self.surface : # si la balle est dans la zone de shoot
-                    return s.to_goal(self.force)
-                else :
-                    return s.avancer_en_esquivant( self.zone )
-            else :
-                if s.estLePlusPrès:
-                    return s.to_ball
+        if s.gotBall : # condition si le joueur peut touche la balle
+            return s.passe
+
+        if s.estLePlusPrès:
+            return s.to_ball
+                
         return s.move(Vector2D((3-2*s.id_team)*GAME_WIDTH * 6/8+s.goal_ally.x , GAME_HEIGHT * 3/8. ))
 
 
@@ -105,7 +102,7 @@ class MilieuDef(Strategy):
             return s.move( s.placerEntrePourxDef(x , s.ball , posAtt) )
         
         return s.move(Vector2D((3-2*s.id_team)*(GAME_WIDTH*3/8)  + s.goal_ally.x,GAME_HEIGHT*9/32)) 
-    
+#        return s.move(Vector2D((3-2*s.id_team)*(GAME_WIDTH*3/8)  + s.goal_ally.x,GAME_HEIGHT*10/32)) 
     
 
 class MilieuAtt(Strategy):

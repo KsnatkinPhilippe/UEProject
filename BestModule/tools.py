@@ -9,7 +9,7 @@ Created on Mon Jan 28 13:34:13 2019
 from soccersimulator import *
 
 class SuperState ( object ):
-    def __init__ ( self , state , id_team , id_player , dribble=.6 , force=.2):
+    def __init__ ( self , state , id_team , id_player , dribble=.7 , force=.2):
             self.state = state
             self.id_team = id_team
             self.id_player = id_player
@@ -43,8 +43,8 @@ class SuperState ( object ):
 #        if(self.ball.x==GAME_WIDTH/2 and  self.ball.y==GAME_HEIGHT/2):
 #        if(self.ball == Vector2D(GAME_WIDTH/2 , GAME_HEIGHT/2)):
 #            return self.move(Vector2D(GAME_WIDTH/2 - 2*(1.5-self.id_team)*15, GAME_HEIGHT/2
-        if self.ball.distance(self.player) < 4 :
-            return self.move(self.ball)
+        if self.ball.distance(self.player) < 3 :
+            return self.move(self.state.ball.vitesse + self.ball)
         return self.move(5*self.state.ball.vitesse + self.ball)
 
 
@@ -77,6 +77,12 @@ class SuperState ( object ):
         advTuple = [( joueur.distance( self.player ) , (joueur.x - self.player.x , joueur.y - self.player.y ) , player )
                     for ( joueur , player ) in self.advs if (2*(1.5-self.id_team)*(self.player.x-joueur.x)<=0)]
         return min( advTuple , default=None)
+    
+    @property
+    def adversaire_le_plus_proche_cercle( self ) :    #trouve l'adversaire le plus proche devant soit renvoi un tuple ( distance , (différence en x , différence en y) , ( id_team, id_ player ) )
+        advTuple = [( joueur.distance( self.player ) , (joueur.x - self.player.x , joueur.y - self.player.y ) , player ) 
+                    for ( joueur , player ) in self.advs]
+        return min( advTuple , default=None)
 
 
 #fonction de tri sorted
@@ -101,8 +107,7 @@ class SuperState ( object ):
             else :
                 return self.dribbler(self.goal)
         else :
-            return self.to_goal(self.force)
-
+            return self.passe
     @property
     def gotBall( self ):
 #        if (self.state.ball.vitesse.norm == 0):
@@ -141,16 +146,23 @@ class SuperState ( object ):
     
     @property 
     def passe(self):
-        ciblePos=self.state.player_state( self.id_team , self.id_player+1).position
+        ciblePos=self.goal
         
-        if self.id_player==3:
-            ciblePos=self.goal
+        if self.id_player<3:
+            ciblePos=self.state.player_state( self.id_team , self.id_player+1).position
         
         if self.id_player<2 and self.state.player_state( self.id_team , self.id_player+1).position.distance(self.player) < 15:
             ciblePos=self.state.player_state( self.id_team , self.id_player+2).position
         
+        dist_opp, diff_xy , player_opp= self.adversaire_le_plus_proche_cercle
+        if dist_opp > 30:
+            return self.shoot(ciblePos , .5)
+        
         d=self.ball.distance(ciblePos)
-        return self.shoot( ciblePos , d/9 )
+        if d < 10 and self.id_player==3:
+            return self.shoot( ciblePos , 6. )
+        
+        return self.shoot( ciblePos , d/11 )
     
     @property
     def attaque(self):
